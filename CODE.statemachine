@@ -76,3 +76,53 @@ end case;
 end process;
 end logic_flow;
 
+----------TEST BENCH---------------
+
+library IEEE;
+use IEEE.Std_logic_1164.all;
+entity state_machine_tb is
+end;
+architecture bench of state_machine_tb is
+component state_machine
+port(clk, reset: in std_logic;
+inp: in std_logic;
+outp: out std_logic);
+end component;
+signal clk, reset: std_logic;
+signal inp: std_logic;
+signal outp: std_logic;
+constant clock_period: time:= 10 ns;
+signal stop_the_clock: boolean;
+begin
+pm: state_machine port map (clk => clk,
+reset => reset,
+inp => inp,
+outp => outp );
+ps: process --stimulus
+begin
+reset<='1'; reset<='0';
+inp<='1';
+wait for clock_period;
+inp<='1';
+wait for clock_period;
+inp<='1';
+wait for clock_period;
+inp<='0';
+wait for clock_period;
+inp<='0';
+wait for clock_period;
+stop_the_clock<=true;
+wait;
+end process;
+pc: process --clock generation
+begin
+while not stop_the_clock loop
+clk<='0';
+wait for clock_period / 2;
+clk<='1';
+wait for clock_period / 2;
+end loop;
+wait;
+end process;
+end;
+
